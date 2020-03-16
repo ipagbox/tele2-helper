@@ -16,10 +16,11 @@
     const TYPE_SMS = 2;
     const TITLE_WARN = true; // show current step it tab title
     const CONSOLE_WARN = true; // show current step it tab title
-    const REFRESH_TIMER = 1000; // timer for the next try if selector not found
-    const BASE_DELAY = 1500; // minimum delay between steps
+    const REFRESH_TIMER = 1500; // timer for the next try if selector not found
+    const BASE_DELAY = 2000; // minimum delay between steps
     const RANDOM_DELAY = 100; // additional random delay between steps to apeear more human
-    const PAGE_RELOAD_DELAY = 30000; // delay for page reload when all steps are done
+    const PAGE_RELOAD_DELAY = 8000; // delay for page reload when all steps are done
+    const PAGE_RELOAD_IF_FAIL = 90000;
     const FIRST_RUN_MARKER = 'FIRST_RUN';
     let price = Array();
     price[TYPE_GIGABYTES] = 15;
@@ -49,6 +50,7 @@
         if (localStorage.getItem("betCount") === null) {
             localStorage.betCount = JSON.stringify(0);
         }
+        setTimeout(() => location.reload(), PAGE_RELOAD_IF_FAIL);
         queue_step({ selector: FIRST_RUN_MARKER, title: 'Init job' });
     }
 
