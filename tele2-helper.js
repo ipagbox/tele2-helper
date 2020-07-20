@@ -19,24 +19,31 @@
     const REFRESH_TIMER = 1500; // timer for the next try if selector not found
     const BASE_DELAY = 2000; // minimum delay between steps
     const RANDOM_DELAY = 100; // additional random delay between steps to apeear more human
-    const PAGE_RELOAD_DELAY = 8000; // delay for page reload when all steps are done
-    const PAGE_RELOAD_IF_FAIL = 90000;
+    const PAGE_RELOAD_DELAY = 5000; // delay for page reload when all steps are done
+    const PAGE_RELOAD_IF_FAIL = 60000;
     const FIRST_RUN_MARKER = 'FIRST_RUN';
     let price = Array();
-    price[TYPE_GIGABYTES] = 15;
+    let volume = Array();
+    price[TYPE_GIGABYTES] = 30;
     price[TYPE_MINUTES] = 40;
     price[TYPE_SMS] = 50;
+    volume[TYPE_GIGABYTES] = 2;
+    volume[TYPE_MINUTES] = 50;
+    volume[TYPE_SMS] = 50;
 
-    const LOT_TYPE = TYPE_MINUTES; /* CHOOSE TYPE YOU NEED */
+    const LOT_TYPE = TYPE_GIGABYTES; /* CHOOSE TYPE YOU NEED */
 
     let task_queue = [{ selector: '.my-active-lots__list .my-lot-item:last-child a', title: 'Edit last lot', fallback: true },
                         { selector: '.btns-box a:nth-child(2)', title: 'Cancel lot' },
                         { selector: '.btns-box a.btn', title: 'Confirm cancel' },
                         { custom_func: wait_cancel_complete, selector: '.info-modal,.violet-style', title: 'Wait cancel complete' },
                         { selector: '.btn-black', title: 'Create new lot', fallback: true },
-                        { selector: `#rw_1_listbox__option__${LOT_TYPE} label`, title: 'Choose lot type' },
+                        { selector: `#rw_1_listbox li:nth-child(${LOT_TYPE + 1}) label`, title: 'Choose lot type' },
                         { selector: '.btns-box a:first-child', title: 'Apply lot type' },
-                        { selector: '.lot-setup__cost-field-container .lot-setup__manual-input a', title: 'Press cost manual input' },
+                        { selector: '.lot-setup__manual-input a', title: 'Press cost manual input' },
+                        { custom_func: input_qty_value, selector: 'input[name=lotVolume]', title: 'Input cost value' },
+                        { custom_func: emulate_input_event, selector: 'input[name=lotVolume]', title: 'Emulate input' },
+                        { selector: '.lot-setup__cost-field-container .lot-setup__manual-input a', title: 'Press volume manual input' },
                         { custom_func: input_cost_value, selector: 'input[name=lotCost]', title: 'Input cost value' },
                         { custom_func: emulate_input_event, selector: 'input[name=lotCost]', title: 'Emulate input' },
                         { selector: '.btns-box a.btn', title: 'Confirm input' },
@@ -93,6 +100,16 @@
             setTimeout(() => input_cost_value(selector), REFRESH_TIMER);
         } else {
             document.querySelector(selector).value = price[LOT_TYPE];
+            setTimeout(() => queue_step(task_queue.shift()), delay());
+        }
+    }
+
+    function input_qty_value(selector) {
+        log_info('Func started: input volume value');
+        if(document.querySelector(selector) == null) {
+            setTimeout(() => input_cost_value(selector), REFRESH_TIMER);
+        } else {
+            document.querySelector(selector).value = volume[LOT_TYPE];
             setTimeout(() => queue_step(task_queue.shift()), delay());
         }
     }
